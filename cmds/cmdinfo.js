@@ -22,6 +22,8 @@ module.exports = {
 			const command = get_info(commandName);
 			if (!command.aliases)
 				command.aliases = 'None';
+			if (!command.perms)
+				command.perms = 'USER'
 			try {
 				let embed = new discord.MessageEmbed()
 					.setTitle(`Command info for ${command.name}.js`)
@@ -29,6 +31,7 @@ module.exports = {
 					.setThumbnail(client.user.avatarURL())
 					.setColor('RANDOM')
 					.addField('**Category**', command.category)
+					.addField('**Permissions**', command.perms.toUpperCase())
 					.addField('**Aliases**', command.aliases)
 					.addField('**Description**', command.desc);
 				msg.channel.send(embed);

@@ -32,11 +32,12 @@ module.exports = {
 				for (let cmd of message.client.commands.array()) {
 					reload(cmd.name)
 				}
-				message.channel.send('All commands sucessfully reloaded!')
+				message.channel.send('**All commands sucessfully reloaded!** :white_check_mark:')
 			} else {
 				newCommand = reload(commandName)
 				if (newCommand.name === undefined) return;
-				message.channel.send(`Successfully reloaded ${newCommand.name}.js!`)
+				message.channel.send(`**Successfully reloaded** 
+			\`${newCommand.name}.js\`**!** :white_check_mark:`)
 			}
 	}
 }

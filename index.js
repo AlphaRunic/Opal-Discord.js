@@ -1,6 +1,7 @@
 require('dotenv').config();
 const Discord = require('discord.js');
 const db = require('quick.db');
+const { GiveawaysManager } = require("discord-giveaways");
 const start_opal_server = require('./server').start;
 //console.log(start_opal_server);
 const client = new Discord.Client({
@@ -23,7 +24,7 @@ const default_prefix = 'opal-';
 const token = process.env.TOKEN;
 
 var opal = {
-	version: 'v7.0 alpha',
+	version: 'v7.1.8 alpha',
 	author: 'Runic#0029',
 	prefix: default_prefix
 };
@@ -40,6 +41,19 @@ for (let cmd of opal.cmdarray) {
 	opal.successful_loads[`${cmd.name}.js`] = 'Success';
 	//console.log(`${cmd.name}.js loaded successfully.`)
 }
+
+const manager = new GiveawaysManager(client, {
+    storage: "./giveaways.json",
+    updateCountdownEvery: 10000,
+    default: {
+        botsCanWin: false,
+        exemptPermissions: [ "ADMINISTRATOR" ],
+        embedColor: "RANDOM",
+        reaction: "🎉"
+    }
+});
+
+client.giveawayManager = manager;
 
 client.on('ready', () => {
   console.log(`${client.user.username} ${opal.version} is online! 💜`)
@@ -89,14 +103,15 @@ client.on('message', async msg => {
 	try {
 		if(command) {
 			const perms = command.perms;
+			const end = '** :x:'
 			let run = false;
 			if (perms === 'admin') {
 				if (!msg.member.hasPermission('ADMINISTRATOR'))
-					return msg.reply('this command is admin only!');
+					return msg.reply('**this command is admin only!'+end);
 				run = true;
 			} else if (perms === 'bot admin') {
 				if (!msg.author.id === '415233686758359051' || !msg.author.id === '415237647146024961')
-					return msg.reply('this command is bot creator only!');
+					return msg.reply('**this command is bot creator only!'+end);
 				run = true;
 			} else if (!perms) {
 				run = true;
