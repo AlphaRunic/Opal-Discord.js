@@ -24,7 +24,7 @@ const default_prefix = 'opal-';
 const token = process.env.TOKEN;
 
 var opal = {
-	version: 'v7.1.8 alpha',
+	version: 'v7.7.4 alpha',
 	author: 'Runic#0029',
 	prefix: default_prefix
 };
@@ -79,19 +79,74 @@ client.on('guildMemberAdd', member => {
 
 client.on('message', async msg => {
 
+	if (msg.author.bot) return;
+	let content = msg.content;
+
+	const lvldb = `level_${msg.author.id}_${msg.guild.id}`;
+	const xpdb = `xp_${msg.author.id}_${msg.guild.id}`;
+	const untildb = `tolvl_${msg.author.id}_${msg.guild.id}`;
+	let level = db.get(lvldb);
+	let xp = db.get(xpdb);
+	let xptolvl = db.get(untildb);
+	if (!level)
+		level = 1;
+	if (!xp)
+		xp = 0;
+	function formula() {
+		return Math.round(350 * (level*1.25));
+	}
+	if (!xptolvl)
+		xptolvl = formula();
+	
+	if ((Math.random() * 100) <= ((1/3) * 100)) {
+		xp = xp + Math.ceil(Math.random() * (35*(level/5)));
+	}
+
+	if (xp >= xptolvl) {
+		xp = xp-xptolvl;
+		level = level + 1;
+		xptolvl = formula();
+		msg.reply(`you leveled up! Current level: ${level}`);
+	}
+
+	let stats = {
+		exp: xp,
+		level: level,
+		tolvl: xptolvl
+	}
+
+	db.set(xpdb, xp);
+	db.set(lvldb, level);
+	db.set(untildb, xptolvl);
+
 	let prefix = db.get(`prefix_${msg.guild.id}`);
 	if(!prefix) { prefix = default_prefix; } else { prefix = prefix.prefix; };
 	prefix = prefix.toLowerCase();
 
-	const def_args = msg.content.slice(prefix.length).trim().split(/ +/g);
+	const def_args = content.slice(prefix.length).trim().split(/ +/g);
 	const def_cmd = def_args.shift().toLowerCase()
-	msg.content = msg.content.toLowerCase();
-  if (msg.author.bot) return;
+	content = content.toLowerCase();
+
+	if (!db.get(`autoreplyoff_${msg.guild.id}`)) {
+
+		if (content.search('no u') > -1 || content.search('no you') > -1)
+			return msg.reply('no u');
+
+		const suicide_msg = content.search(/\bkms\b/i) > -1 || content.search(/\b(kill myself)\b/i) > -1;
+		if (suicide_msg)
+			return msg.reply('don\'t say that. Call 1-800-273-8255 for the National Suicide Prevention Lifeline.');
+
+		const can_u_not = content.search('can you not') > -1 || content.search('can u not') > -1;
+		if (can_u_not)
+			return msg.reply('can *you* not?');
+
+	}
+
   if (!msg.guild) return;
-  if (!msg.content.startsWith(prefix)) return;
+  if (!content.startsWith(prefix)) return;
   if (!msg.member) msg.member = await msg.guild.fetchMember(msg);
 
-  const args = msg.content.slice(prefix.length).trim().split(/ +/g);
+  const args = content.slice(prefix.length).trim().split(/ +/g);
   const cmd = args.shift().toLowerCase();
 
   if (!cmd || cmd.length === 0) return;
@@ -119,7 +174,7 @@ client.on('message', async msg => {
 				return msg.reply(`invalid perms inputted: ${perms}`)
 			}
 			if (run === true)
-				command.run(client,msg,args,opal,Discord,def_args);
+				return command.run(client,msg,args,opal,Discord,def_args,stats);
 		}
 	} catch (err) {
 		msg.channel.send(`Error: \`${err}\`\nStack:\n\`${err.message}\``)

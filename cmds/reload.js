@@ -36,8 +36,7 @@ module.exports = {
 			} else {
 				newCommand = reload(commandName)
 				if (newCommand.name === undefined) return;
-				message.channel.send(`**Successfully reloaded** 
-			\`${newCommand.name}.js\`**!** :white_check_mark:`)
+				message.channel.send(`**Successfully reloaded** \`${newCommand.name}.js\`**!** :white_check_mark:`)
 			}
 	}
 }
