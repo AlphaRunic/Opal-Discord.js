@@ -40,7 +40,7 @@
     "getanimals": "^3.0.0",
     "google": "^2.1.0",
     "ms": "^2.1.2",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "node-superfetch": "^0.1.10",
     "nodejs-base64": "^1.0.3",
     "nodemon": "^2.0.4",
